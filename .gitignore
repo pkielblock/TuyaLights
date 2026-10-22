@@ -1,0 +1,12 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+
+# Recorded commands for real lamps (see Lamps.example.json)
+TuyaLights/Lamps.json
