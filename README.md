@@ -93,6 +93,19 @@ Copy `Lamps.example.json` to `TuyaLights/Lamps.json` and fill it in:
 
 Open `TuyaLights.xcodeproj`, set your own signing team and bundle identifier, and run the app on your iPhone. Bluetooth broadcasting doesn't work in the Simulator.
 
+For a development-signed IPA, the embedded provisioning profile must include your
+iPhone and must not have expired. To install without signing it again, unzip the IPA
+and drag `Payload/TuyaLights.app` into Xcode's Devices and Simulators window for your
+connected iPhone. Free accounts support up to three installed apps, and their builds
+expire after seven days; rebuild with Xcode to renew them.
+
+Keep the installed bundle identifier and signing team when updating, and install over
+the existing app. Deleting Lights removes its saved counters, scenes and groups.
+
+Sideloadly error `7252` (certificate not found on the team) concerns its Apple signing
+request; changing the IPA's bundle identifier does not fix that request. An already
+signed build can instead be installed directly through Xcode.
+
 ## Limitations
 
 - **Only recorded commands work.** Payloads are encrypted, so new colours or brightness levels can't be generated without the lamp keys and the encryption scheme. Both are still unknown.
