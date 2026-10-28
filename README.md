@@ -89,6 +89,10 @@ Copy `Lamps.example.json` to `TuyaLights/Lamps.json` and fill it in:
 
 `Lamps.json` is in `.gitignore`. Anyone who has it can control your lamps from within Bluetooth range, so don't publish it.
 
+Keep a private backup of this file. You can also keep it outside the checkout and
+symlink it to `TuyaLights/Lamps.json`. The build checks that the file is present and
+matches the bundled resource, so it cannot silently produce an app with no lamps.
+
 ### 3. Build
 
 Open `TuyaLights.xcodeproj`, set your own signing team and bundle identifier, and run the app on your iPhone. Bluetooth broadcasting doesn't work in the Simulator.

@@ -55,6 +55,7 @@
 				FE107A13A7C1D33D9BF6AE1B /* Sources */,
 				EC429E32FCA08204CE45A2AB /* Frameworks */,
 				7BEE8E48D505E10CA4A81093 /* Resources */,
+				C719869E54D44E879C6A0973 /* Check lamp configuration */,
 			);
 			buildRules = (
 			);
@@ -111,6 +112,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C719869E54D44E879C6A0973 /* Check lamp configuration */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = ();
+			inputPaths = ();
+			name = "Check lamp configuration";
+			outputPaths = ();
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "test -s \"${SRCROOT}/TuyaLights/Lamps.json\" && cmp -s \"${SRCROOT}/TuyaLights/Lamps.json\" \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Lamps.json\" || { echo \"error: Missing or stale bundled Lamps.json. Restore TuyaLights/Lamps.json with your recorded lamp commands before building.\"; exit 1; }\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		FE107A13A7C1D33D9BF6AE1B /* Sources */ = {
