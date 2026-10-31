@@ -1,5 +1,7 @@
 # Lights
 
+English · [Português (Brasil)](README.pt-BR.md)
+
 An iPhone app that controls Tuya Bluetooth bulbs (sold under the Smart Life / Tuya brands) without the Tuya cloud, an account, or the Smart Life app.
 
 Many cheap Tuya Bluetooth bulbs don't take a normal Bluetooth connection. Smart Life controls them with **Tuya Beacon**: the phone broadcasts short frames, every bulb nearby listens, and the bulb named in the frame acts on it. The bulbs never reply. Lights records those frames once and then sends them itself, so it works offline with no account.
@@ -11,7 +13,8 @@ Many cheap Tuya Bluetooth bulbs don't take a normal Bluetooth connection. Smart 
 - **Groups:** control several lamps as one, with power, whites and colours
 - **Scenes:** one tap sets each lamp to its own state, for example two lamps warm, one red, two off; lamps a scene doesn't mention are left alone
 - **Arrange mode:** tap Edit to drag tiles into your order, rename lamps, and edit or delete scenes and groups
-- English and Portuguese, set in Settings; English is the default
+- English and Portuguese (Brasil), switched in Settings without restarting; English is the default
+- Black, quiet look: neutral cards, one blue accent for what's on or selected, native Liquid Glass buttons on iOS 26
 - No network access, no account and no analytics; everything stays on the phone
 
 Brightness isn't supported, because a command only works if it was recorded first (see [Limitations](#limitations)).
@@ -130,7 +133,8 @@ TuyaLights/
   LampList.swift      Lamp names and order
   SettingsView.swift  Language
   Language.swift      English and Portuguese strings
-  Style.swift         Background and glass styles
+  Style.swift         Black background, cards, accent and glass buttons
+  pt-BR.lproj/        Portuguese app name and Bluetooth prompt
 tools/record.swift    Mac recorder for Smart Life frames
 Lamps.example.json    Template for TuyaLights/Lamps.json
 ```
