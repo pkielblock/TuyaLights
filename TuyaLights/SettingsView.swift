@@ -15,12 +15,13 @@ struct SettingsView: View {
                     .labelsHidden()
                 }
                 Section {
-                    Text(L("Tap Edit on the home screen to reorder tiles and rename lamps.",
-                           "Toque em Editar na tela inicial para reordenar os blocos e renomear as lâmpadas."))
+                    Text(L("Tap Edit on the home screen to reorder tiles and rename lamps",
+                           "Toque em Editar na tela inicial para reordenar os blocos e renomear as lâmpadas"))
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
             }
+            .screenBackground()
             .navigationTitle(L("Settings", "Ajustes"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

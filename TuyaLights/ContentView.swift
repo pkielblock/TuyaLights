@@ -15,23 +15,24 @@ struct ContentView: View {
     /// Arrange mode, like a dashboard's edit mode: drag tiles to reorder, tap to rename or edit.
     @State private var arranging = false
 
-    private let columns = [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)]
+    private let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 18) {
+                VStack(spacing: 16) {
                     if remote.bluetoothState == .poweredOff || remote.bluetoothState == .unauthorized {
                         bluetoothNotice
                     }
                     if arranging {
-                        Text(L("Drag tiles to reorder. Tap a lamp to rename it, or a scene or group to edit it.",
-                               "Arraste os blocos para reordenar. Toque numa lâmpada para renomear, ou numa cena ou grupo para editar."))
+                        Text(L("Drag tiles to reorder. Tap a lamp to rename it, or a scene or group to edit it",
+                               "Arraste os blocos para reordenar. Toque numa lâmpada para renomear, ou numa cena ou grupo para editar"))
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .transition(.rise)
                     } else {
-                        allButtons
+                        allButtons.transition(.rise)
                     }
                     if !scenes.scenes.isEmpty {
                         heading(L("Scenes", "Cenas"))
@@ -52,7 +53,7 @@ struct ContentView: View {
                     }
                     if !groups.groups.isEmpty {
                         heading(L("Groups", "Grupos"))
-                        LazyVGrid(columns: columns, spacing: 14) {
+                        LazyVGrid(columns: columns, spacing: 12) {
                             ForEach(groups.groups) { group in
                                 tile("group", group.id.uuidString,
                                      onDrop: { groups.move(UUID(uuidString: $0)!, before: group.id) },
@@ -67,7 +68,7 @@ struct ContentView: View {
                     if !scenes.scenes.isEmpty || !groups.groups.isEmpty {
                         heading(L("Lamps", "Lâmpadas"))
                     }
-                    LazyVGrid(columns: columns, spacing: 14) {
+                    LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(lampList.lamps) { lamp in
                             tile("lamp", lamp.node,
                                  onDrop: { lampList.move($0, before: lamp.node) },
@@ -79,12 +80,12 @@ struct ContentView: View {
                         }
                     }
                 }
-                .padding()
+                .padding(16)
                 .animation(.snappy, value: lampList.lamps.map(\.node))
                 .animation(.snappy, value: scenes.scenes)
                 .animation(.snappy, value: groups.groups)
             }
-            .background(LightsBackground())
+            .screenBackground()
             .navigationTitle(L("Lights", "Luzes"))
             .navigationDestination(for: BeaconLamp.self) { LampView(title: $0.name, lamps: [$0]) }
             .navigationDestination(for: LampGroup.self) { group in
@@ -95,7 +96,7 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button(arranging ? L("Done", "OK") : L("Edit", "Editar")) {
-                        withAnimation { arranging.toggle() }
+                        withAnimation(.easeOut(duration: 0.2)) { arranging.toggle() }
                     }
                 }
                 if !arranging {
@@ -108,11 +109,11 @@ struct ContentView: View {
                                 editing = LampGroup(name: "", nodes: [])
                             }
                         } label: {
-                            Image(systemName: "plus")
+                            Image(systemName: "plus").accessibilityLabel(L("Add", "Adicionar"))
                         }
                     }
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button { showSettings = true } label: { Image(systemName: "gearshape") }
+                        Button { showSettings = true } label: { Image(systemName: "gearshape").accessibilityLabel(L("Settings", "Ajustes")) }
                     }
                 }
             }
@@ -141,7 +142,7 @@ struct ContentView: View {
         if arranging {
             content()
                 .allowsHitTesting(false)
-                .overlay(RoundedRectangle(cornerRadius: 24).strokeBorder(.white.opacity(0.35), style: StrokeStyle(lineWidth: 1.5, dash: [6])))
+                .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.white.opacity(0.1), style: StrokeStyle(lineWidth: 1, dash: [4])))
                 .contentShape(Rectangle())
                 .onTapGesture(perform: onTap)
                 .overlay(alignment: .topLeading) {
@@ -150,9 +151,12 @@ struct ContentView: View {
                             Image(systemName: "minus.circle.fill")
                                 .font(.title2)
                                 .symbolRenderingMode(.palette)
-                                .foregroundStyle(.white, .red)
+                                .foregroundStyle(.white, Color(red: 240 / 255, green: 92 / 255, blue: 92 / 255))
+                                .frame(width: 44, height: 44)
+                                .contentShape(Rectangle())
                         }
-                        .offset(x: -8, y: -8)
+                        .accessibilityLabel(L("Delete", "Apagar"))
+                        .offset(x: -20, y: -20)
                     }
                 }
                 .draggable("\(kind):\(id)")
@@ -171,7 +175,7 @@ struct ContentView: View {
             Button { remote.setAll(true) } label: {
                 Label(L("All on", "Ligar todas"), systemImage: "lightbulb.fill").frame(maxWidth: .infinity)
             }
-            .glassButton(prominent: true, tint: .orange)
+            .glassButton()
             Button { remote.setAll(false) } label: {
                 Label(L("All off", "Desligar todas"), systemImage: "lightbulb.slash").frame(maxWidth: .infinity)
             }
@@ -181,18 +185,18 @@ struct ContentView: View {
     }
 
     private func heading(_ text: String) -> some View {
-        Text(text).font(.title3.bold()).frame(maxWidth: .infinity, alignment: .leading)
+        Text(text).font(.title3.weight(.medium)).frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var bluetoothNotice: some View {
         Label(remote.bluetoothState == .unauthorized
-              ? L("Allow Bluetooth for Lights in Settings.", "Permita Bluetooth para Luzes em Ajustes.")
-              : L("Bluetooth is off.", "Bluetooth está desligado."),
+              ? L("Allow Bluetooth for Lights in Settings", "Permita Bluetooth para Luzes em Ajustes")
+              : L("Bluetooth is off", "Bluetooth está desligado"),
               systemImage: "exclamationmark.triangle.fill")
             .font(.subheadline)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .glassBackground(in: RoundedRectangle(cornerRadius: 18))
+            .padding(12)
+            .card()
     }
 }
 
@@ -211,25 +215,29 @@ struct LampCard: View {
                 Image(systemName: on ? "lightbulb.fill" : "lightbulb")
                     .font(.title)
                     .foregroundStyle(on ? look.colour : .secondary)
-                    .shadow(color: on ? look.colour.opacity(0.8) : .clear, radius: 10)
+                    .contentTransition(.symbolEffect(.replace))
                 Spacer()
                 Button { remote.setPower(!on, for: lamps) } label: {
                     Image(systemName: "power")
-                        .font(.headline)
-                        .frame(width: 40, height: 40)
+                        .font(.body.weight(.medium))
+                        .frame(width: 44, height: 44)
                         .foregroundStyle(on ? .white : .primary)
-                        .background(on ? Color.orange : Color.clear, in: Circle())
+                        .background(on ? Color.accent : Color.clear, in: Circle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(on ? L("Turn off", "Desligar") : L("Turn on", "Ligar"))
                 .glassBackground(in: Circle())
             }
-            Text(title).font(.headline).lineLimit(1)
+            Text(title).font(.body.weight(.medium)).lineLimit(1)
             Text(on ? look.label : BeaconCommand.off.label)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+                .contentTransition(.opacity)
         }
-        .padding(16)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassBackground(in: RoundedRectangle(cornerRadius: 24))
+        .card(selected: on)
+        .animation(.easeOut(duration: 0.2), value: on)
+        .animation(.easeOut(duration: 0.2), value: look)
     }
 }

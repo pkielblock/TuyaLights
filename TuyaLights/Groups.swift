@@ -70,13 +70,14 @@ struct GroupEditor: View {
                                 Text(lamp.name).foregroundStyle(.primary)
                                 Spacer()
                                 if group.nodes.contains(lamp.node) {
-                                    Image(systemName: "checkmark").foregroundStyle(.orange)
+                                    Image(systemName: "checkmark").foregroundStyle(Color.accent)
                                 }
                             }
                         }
                     }
                 }
             }
+            .screenBackground()
             .navigationTitle(L("Group", "Grupo"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

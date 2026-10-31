@@ -1,27 +1,21 @@
 import SwiftUI
 
-/// Soft gradient so the glass has something to refract.
-struct LightsBackground: View {
-    @Environment(\.colorScheme) private var scheme
-    var glow: Color? = nil
-
-    var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: scheme == .dark
-                    ? [Color(red: 0.06, green: 0.06, blue: 0.12), Color(red: 0.13, green: 0.07, blue: 0.16)]
-                    : [Color(red: 0.93, green: 0.93, blue: 0.98), Color(red: 0.98, green: 0.92, blue: 0.90)],
-                startPoint: .topLeading, endPoint: .bottomTrailing)
-            if let glow {
-                RadialGradient(colors: [glow.opacity(0.55), .clear], center: .top, startRadius: 0, endRadius: 520)
-                    .animation(.easeInOut(duration: 0.4), value: glow)
-            }
-        }
-        .ignoresSafeArea()
-    }
+extension Color {
+    /// T3 accent, only for selection and the active state.
+    static let accent = Color(red: 0x34 / 255, green: 0x6b / 255, blue: 0xf1 / 255)
 }
 
 extension View {
+    /// T3 black behind a screen. Forms also hide their own grey background.
+    func screenBackground() -> some View {
+        scrollContentBackground(.hidden).background(Color.black.ignoresSafeArea())
+    }
+
+    /// Neutral card: white 4%, or 8% when selected or active. Radius 12, no border.
+    func card(selected: Bool = false) -> some View {
+        background(.white.opacity(selected ? 0.08 : 0.04), in: RoundedRectangle(cornerRadius: 12))
+    }
+
     /// Liquid Glass button on iOS 26+, bordered style before that.
     @ViewBuilder
     func glassButton(prominent: Bool = false, tint: Color? = nil) -> some View {
@@ -32,7 +26,7 @@ extension View {
         }
     }
 
-    /// Liquid Glass surface on iOS 26+, thin material (acrylic) before that.
+    /// Liquid Glass surface on iOS 26+, thin material before that. Only for round power buttons.
     @ViewBuilder
     func glassBackground<S: Shape>(in shape: S) -> some View {
         if #available(iOS 26, *) {
@@ -41,4 +35,9 @@ extension View {
             background(.ultraThinMaterial, in: shape)
         }
     }
+}
+
+extension AnyTransition {
+    /// Screen and mode changes: fade with a 4 pt rise.
+    static let rise = AnyTransition.opacity.combined(with: .offset(y: 4))
 }

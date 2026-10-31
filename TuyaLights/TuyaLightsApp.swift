@@ -14,6 +14,8 @@ struct TuyaLightsApp: App {
                 .environmentObject(groups)
                 .environmentObject(scenes)
                 .environmentObject(lampList)
+                .preferredColorScheme(.dark)
+                .tint(.accent)
         }
     }
 }

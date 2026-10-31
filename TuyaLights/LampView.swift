@@ -7,7 +7,7 @@ struct LampView: View {
     var title: String
     var lamps: [BeaconLamp]
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 14), count: 4)
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 4)
 
     var body: some View {
         let on = remote.isOn(lamps)
@@ -18,21 +18,24 @@ struct LampView: View {
                 Text(on ? look.label : BeaconCommand.off.label)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .contentTransition(.opacity)
 
                 section(L("White", "Branco"), icon: "thermometer.medium") {
-                    LazyVGrid(columns: Array(columns.prefix(3)), spacing: 14) {
+                    LazyVGrid(columns: Array(columns.prefix(3)), spacing: 12) {
                         ForEach(BeaconCommand.whites, id: \.self) { swatch($0, selected: on && look == $0) }
                     }
                 }
                 section(L("Colour", "Cor"), icon: "paintpalette") {
-                    LazyVGrid(columns: columns, spacing: 14) {
+                    LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(BeaconCommand.colours, id: \.self) { swatch($0, selected: on && look == $0) }
                     }
                 }
             }
-            .padding()
+            .padding(16)
+            .animation(.easeOut(duration: 0.2), value: on)
+            .animation(.easeOut(duration: 0.2), value: look)
         }
-        .background(LightsBackground(glow: on ? look.colour : nil))
+        .screenBackground()
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -40,38 +43,39 @@ struct LampView: View {
     private func powerButton(on: Bool, look: BeaconCommand) -> some View {
         Button { remote.setPower(!on, for: lamps) } label: {
             Image(systemName: "power")
-                .font(.system(size: 44, weight: .semibold))
+                .font(.system(size: 44, weight: .medium))
                 .foregroundStyle(on ? .white : .primary)
                 .frame(width: 120, height: 120)
-                .background(on ? look.colour.opacity(0.9) : .clear, in: Circle())
+                .background(on ? Color.accent : .clear, in: Circle())
         }
         .buttonStyle(.plain)
         .glassBackground(in: Circle())
-        .shadow(color: on ? look.colour.opacity(0.6) : .clear, radius: 24)
+        .accessibilityLabel(on ? L("Turn off", "Desligar") : L("Turn on", "Ligar"))
         .padding(.top, 20)
     }
 
     private func swatch(_ command: BeaconCommand, selected: Bool) -> some View {
         Button { remote.setLook(command, for: lamps) } label: {
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 Circle()
                     .fill(command.colour)
                     .frame(width: 52, height: 52)
-                    .overlay(Circle().stroke(.white, lineWidth: selected ? 3 : 0))
-                    .shadow(color: command.colour.opacity(selected ? 0.8 : 0), radius: 10)
+                    .padding(4)
+                    .overlay(Circle().strokeBorder(Color.accent, lineWidth: selected ? 2 : 0))
                 Text(command.label).font(.caption).foregroundStyle(.secondary).lineLimit(1)
             }
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     private func section<Content: View>(_ title: String, icon: String,
                                          @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             Label(title, systemImage: icon).font(.subheadline.weight(.medium)).foregroundStyle(.secondary)
             content()
         }
-        .padding(16)
-        .glassBackground(in: RoundedRectangle(cornerRadius: 24))
+        .padding(12)
+        .card()
     }
 }

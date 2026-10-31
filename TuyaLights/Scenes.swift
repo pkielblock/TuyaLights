@@ -68,21 +68,21 @@ struct SceneEditor: View {
     @Environment(\.dismiss) private var dismiss
     @State var scene: LampScene
 
-    private let dots = [GridItem(.adaptive(minimum: 34), spacing: 10)]
+    private let dots = [GridItem(.adaptive(minimum: 44), spacing: 4)]
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 14) {
+                VStack(spacing: 12) {
                     TextField(L("Scene name", "Nome da cena"), text: $scene.name)
-                        .font(.title3.weight(.semibold))
-                        .padding(16)
-                        .glassBackground(in: RoundedRectangle(cornerRadius: 20))
+                        .font(.title3.weight(.medium))
+                        .padding(12)
+                        .card()
                     ForEach(lampList.lamps) { lamp in lampCard(lamp) }
                 }
-                .padding()
+                .padding(16)
             }
-            .background(LightsBackground())
+            .screenBackground()
             .navigationTitle(L("Scene", "Cena"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -106,31 +106,34 @@ struct SceneEditor: View {
             HStack {
                 Image(systemName: setting == nil || setting == .off ? "lightbulb" : "lightbulb.fill")
                     .foregroundStyle(setting.map { $0 == .off || $0 == .on ? Color.secondary : $0.colour } ?? .secondary)
-                Text(lamp.name).font(.headline)
+                Text(lamp.name).font(.body.weight(.medium))
             }
             HStack(spacing: 8) {
                 choice(L("Skip", "Ignorar"), selected: setting == nil) { scene.settings[lamp.node] = nil }
                 choice(L("Off", "Desligar"), selected: setting == .off) { scene.settings[lamp.node] = .off }
                 choice(L("On", "Ligar"), selected: setting == .on) { scene.settings[lamp.node] = .on }
             }
-            LazyVGrid(columns: dots, spacing: 10) {
+            LazyVGrid(columns: dots, spacing: 4) {
                 ForEach(BeaconCommand.whites + BeaconCommand.colours, id: \.self) { command in
                     Button { scene.settings[lamp.node] = command } label: {
                         Circle()
                             .fill(command.colour)
-                            .frame(width: 34, height: 34)
-                            .overlay(Circle().stroke(.white, lineWidth: setting == command ? 3 : 0))
-                            .shadow(color: command.colour.opacity(setting == command ? 0.8 : 0), radius: 8)
+                            .frame(width: 32, height: 32)
+                            .padding(4)
+                            .overlay(Circle().strokeBorder(Color.accent, lineWidth: setting == command ? 2 : 0))
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(command.label)
+                    .accessibilityAddTraits(setting == command ? .isSelected : [])
                 }
             }
         }
-        .padding(16)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassBackground(in: RoundedRectangle(cornerRadius: 24))
-        .opacity(setting == nil ? 0.75 : 1)
+        .card(selected: setting != nil)
+        .animation(.easeOut(duration: 0.2), value: setting)
     }
 
     private func choice(_ title: String, selected: Bool, action: @escaping () -> Void) -> some View {
@@ -138,11 +141,11 @@ struct SceneEditor: View {
             Text(title)
                 .font(.subheadline.weight(.medium))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
+                .frame(minHeight: 44)
                 .foregroundStyle(selected ? .white : .primary)
-                .background(selected ? Color.orange : Color.clear, in: Capsule())
+                .background(selected ? Color.accent : .white.opacity(0.06), in: Capsule())
         }
         .buttonStyle(.plain)
-        .glassBackground(in: Capsule())
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
